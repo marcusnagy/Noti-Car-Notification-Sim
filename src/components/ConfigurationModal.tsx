@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatedModal } from "aceternity-ui/modal";
+import { Modal } from "aceternity-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
@@ -57,7 +57,7 @@ export function ConfigurationModal() {
         Configure
       </Button>
 
-      <AnimatedModal
+      <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         className="w-full max-w-2xl mx-auto"
@@ -156,7 +156,7 @@ export function ConfigurationModal() {
             </Button>
           </form>
         </div>
-      </AnimatedModal>
+      </Modal>
     </>
   );
 }

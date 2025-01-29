@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { ConfigurationModal } from "@/components/ConfigurationModal";
 
 interface Car {
@@ -61,7 +59,7 @@ const Index = () => {
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <BackgroundGradient className="rounded-[22px]">
+                  <div className="rounded-[22px] p-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
                     <Card className="overflow-hidden border-0 bg-white/95 dark:bg-black/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-xl">
                       <CardContent className="p-6">
                         <div className="bg-gray-100/90 dark:bg-gray-900/70 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
@@ -89,7 +87,7 @@ const Index = () => {
                         </Button>
                       </CardFooter>
                     </Card>
-                  </BackgroundGradient>
+                  </div>
                 </motion.div>
               ))}
               <motion.div
@@ -98,7 +96,7 @@ const Index = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <BackgroundGradient className="rounded-[22px] h-full">
+                <div className="rounded-[22px] p-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 h-full">
                   <Card className="flex items-center justify-center h-full min-h-[360px] border-0 bg-white/95 dark:bg-black/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-xl">
                     <Button
                       onClick={handleAddCar}
@@ -108,13 +106,12 @@ const Index = () => {
                       <PlusCircle className="w-10 h-10" />
                     </Button>
                   </Card>
-                </BackgroundGradient>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
         )}
       </div>
-      <BackgroundBeams />
     </div>
   );
 };
