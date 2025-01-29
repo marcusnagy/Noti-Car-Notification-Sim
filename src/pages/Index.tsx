@@ -40,7 +40,7 @@ const Index = () => {
           >
             <Button
               onClick={handleAddCar}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-xl flex items-center gap-2 text-lg transition-all duration-300 hover:scale-105"
+              className="bg-primary hover:bg-primary/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-white px-8 py-6 rounded-xl flex items-center gap-2 text-lg transition-all duration-300 hover:scale-105"
             >
               <PlusCircle className="w-6 h-6" />
               Add Car
@@ -58,9 +58,9 @@ const Index = () => {
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="overflow-hidden border border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  <Card className="overflow-hidden border border-border/40 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <CardContent className="p-6">
-                      <div className="bg-muted/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
+                      <div className="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
                         <Bell className="w-8 h-8 text-muted-foreground/60" />
                         <p className="text-sm text-muted-foreground text-center">
                           Notifications for Car #{car.id.slice(0, 4)} will appear here
@@ -93,7 +93,7 @@ const Index = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="flex items-center justify-center h-full min-h-[360px] border border-dashed border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <Card className="flex items-center justify-center h-full min-h-[360px] border border-dashed border-border/40 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                   <Button
                     onClick={handleAddCar}
                     variant="ghost"
