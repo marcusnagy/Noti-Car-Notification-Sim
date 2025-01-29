@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -60,12 +60,13 @@ const Index = () => {
                 >
                   <Card className="overflow-hidden border border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <CardContent className="p-6">
-                      <img
-                        src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
-                        alt="Car placeholder"
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                      <div className="space-y-2">
+                      <div className="bg-muted/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
+                        <Bell className="w-8 h-8 text-muted-foreground/60" />
+                        <p className="text-sm text-muted-foreground text-center">
+                          Notifications for Car #{car.id.slice(0, 4)} will appear here
+                        </p>
+                      </div>
+                      <div className="space-y-2 mt-4">
                         <h3 className="font-medium text-lg">Car #{car.id.slice(0, 4)}</h3>
                         <p className="text-sm text-muted-foreground">
                           Added on {car.createdAt.toLocaleDateString()}
