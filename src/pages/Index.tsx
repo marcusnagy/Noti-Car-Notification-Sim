@@ -6,6 +6,7 @@ import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
+import { ConfigurationModal } from "@/components/ConfigurationModal";
 
 interface Car {
   id: string;
@@ -31,6 +32,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full dark:bg-black bg-white dark:bg-grid-white/[0.05] bg-grid-black/[0.05] relative flex items-center justify-center p-4 md:p-8">
+      <ConfigurationModal />
       <div className="relative z-10 w-full max-w-7xl">
         {cars.length === 0 ? (
           <motion.div
