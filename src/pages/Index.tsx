@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { BackgroundGradient } from "aceternity-ui/background-gradient";
+import { BackgroundGradient } from "@/components/ui/background-gradient";
 
 interface Car {
   id: string;
