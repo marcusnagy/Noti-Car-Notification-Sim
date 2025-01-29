@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
+import { BackgroundGradient } from "aceternity-ui/background-gradient";
 
 interface Car {
   id: string;
@@ -58,33 +59,35 @@ const Index = () => {
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="overflow-hidden border border-border/40 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <CardContent className="p-6">
-                      <div className="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
-                        <Bell className="w-8 h-8 text-muted-foreground/60" />
-                        <p className="text-sm text-muted-foreground text-center">
-                          Notifications for Car #{car.id.slice(0, 4)} will appear here
-                        </p>
-                      </div>
-                      <div className="space-y-2 mt-4">
-                        <h3 className="font-medium text-lg">Car #{car.id.slice(0, 4)}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Added on {car.createdAt.toLocaleDateString()}
-                        </p>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="p-6 pt-0">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => handleDeleteCar(car.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Remove Car
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  <BackgroundGradient className="rounded-[22px]">
+                    <Card className="overflow-hidden border-0 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                      <CardContent className="p-6">
+                        <div className="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
+                          <Bell className="w-8 h-8 text-muted-foreground/60" />
+                          <p className="text-sm text-muted-foreground text-center">
+                            Notifications for Car #{car.id.slice(0, 4)} will appear here
+                          </p>
+                        </div>
+                        <div className="space-y-2 mt-4">
+                          <h3 className="font-medium text-lg">Car #{car.id.slice(0, 4)}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Added on {car.createdAt.toLocaleDateString()}
+                          </p>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="p-6 pt-0">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => handleDeleteCar(car.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Remove Car
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </BackgroundGradient>
                 </motion.div>
               ))}
               <motion.div
@@ -93,15 +96,17 @@ const Index = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="flex items-center justify-center h-full min-h-[360px] border border-dashed border-border/40 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                  <Button
-                    onClick={handleAddCar}
-                    variant="ghost"
-                    className="h-20 w-20 rounded-full"
-                  >
-                    <PlusCircle className="w-10 h-10" />
-                  </Button>
-                </Card>
+                <BackgroundGradient className="rounded-[22px] h-full">
+                  <Card className="flex items-center justify-center h-full min-h-[360px] border-0 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <Button
+                      onClick={handleAddCar}
+                      variant="ghost"
+                      className="h-20 w-20 rounded-full"
+                    >
+                      <PlusCircle className="w-10 h-10" />
+                    </Button>
+                  </Card>
+                </BackgroundGradient>
               </motion.div>
             </AnimatePresence>
           </div>
