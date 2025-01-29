@@ -60,9 +60,9 @@ const Index = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <BackgroundGradient className="rounded-[22px]">
-                    <Card className="overflow-hidden border-0 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <Card className="overflow-hidden border-0 bg-white/95 dark:bg-black/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-xl">
                       <CardContent className="p-6">
-                        <div className="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
+                        <div className="bg-gray-100/90 dark:bg-gray-900/70 rounded-lg p-4 h-48 flex flex-col items-center justify-center space-y-3">
                           <Bell className="w-8 h-8 text-muted-foreground/60" />
                           <p className="text-sm text-muted-foreground text-center">
                             Notifications for Car #{car.id.slice(0, 4)} will appear here
@@ -97,7 +97,7 @@ const Index = () => {
                 transition={{ duration: 0.3 }}
               >
                 <BackgroundGradient className="rounded-[22px] h-full">
-                  <Card className="flex items-center justify-center h-full min-h-[360px] border-0 bg-white/95 dark:bg-black/50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                  <Card className="flex items-center justify-center h-full min-h-[360px] border-0 bg-white/95 dark:bg-black/60 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-xl">
                     <Button
                       onClick={handleAddCar}
                       variant="ghost"

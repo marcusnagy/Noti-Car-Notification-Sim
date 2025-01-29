@@ -16,8 +16,8 @@ export const BackgroundGradient = ({
       )}
     >
       <div
-        className="absolute -inset-px bg-gradient-to-r from-neutral-400/10 via-neutral-400/25 to-neutral-400/10 
-        rounded-[inherit] group-hover/card:opacity-100 opacity-50 transition duration-500"
+        className="absolute -inset-px bg-gradient-to-r from-purple-500/20 via-pink-500/40 to-orange-500/20 
+        rounded-[inherit] group-hover/card:opacity-100 opacity-70 transition duration-500 blur-[1px]"
       />
       {children}
     </div>
