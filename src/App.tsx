@@ -1,5 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -15,8 +14,26 @@ const App = () => (
     <ThemeProvider defaultTheme="dark" attribute="class">
       <TooltipProvider>
         <ThemeToggle />
-        <Toaster />
-        <Sonner />
+        <Toaster
+          position="bottom-right"
+          expand={true}
+          richColors
+          closeButton
+          theme="system"
+          style={{ 
+            marginBottom: "2rem",
+            marginRight: "2rem"
+          }}
+          toastOptions={{
+            style: {
+              fontSize: "16px",
+              padding: "16px",
+              borderRadius: "12px",
+              border: "none",
+            },
+            duration: 2000,
+          }}
+        />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
