@@ -3,7 +3,7 @@ import { PlayCircle, StopCircle, CheckCircle2, XCircle, AlertOctagon, MapPin, In
 import { toast } from "sonner";
 import { NotificationModal } from "@/components/Notification";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { RabbitMQClient, CarMetadata, Notification } from "@/services/RabbitMQService";
+import { RabbitMQClient, CarMetadata, Notification, GeneralNotificaiton } from "@/services/RabbitMQService";
 import { AnimatedList } from "@/components/ui/animated-list";
 import { Alert } from "@heroui/alert";
 import { cn } from "@/lib/utils";
@@ -28,40 +28,52 @@ interface NotificationItemProps {
 function getIcon(type: string) {
   const baseClasses = "h-5 w-5";
   
-  switch (type) {
+  switch (type.toLowerCase()) {
     case 'ack':
       return <CheckCircle2 className={cn(baseClasses, "text-emerald-500 dark:text-emerald-400")} strokeWidth={2} />;
     case 'info':
       return <Info className={cn(baseClasses, "text-blue-500 dark:text-blue-400")} strokeWidth={2} />;
     case 'warning':
       return <AlertOctagon className={cn(baseClasses, "text-amber-500 dark:text-amber-400")} strokeWidth={2} />;
-    case 'poi':
-      return <MapPin className={cn(baseClasses, "text-violet-500 dark:text-violet-400")} strokeWidth={2} />;
+    case 'error':
+    case 'danger':
+      return <XCircle className={cn(baseClasses, "text-red-500 dark:text-red-400")} strokeWidth={2} />;
     default:
-      return <CheckCircle2 className={cn(baseClasses, "text-emerald-500 dark:text-emerald-400")} strokeWidth={2} />;
+      return <Info className={cn(baseClasses, "text-gray-500 dark:text-gray-400")} strokeWidth={2} />;
   }
 }
 
 function getColor(type: string): 'warning' | 'default' | 'primary' | 'secondary' | 'success' | 'danger' {
-  switch (type) {
+  switch (type.toLowerCase()) {
     case 'ack':
       return 'success';
     case 'info':
       return 'primary';
     case 'warning':
       return 'warning';
-    case 'poi':
-      return 'secondary';
+    case 'error':
+    case 'danger':
+      return 'danger';
     default:
       return 'default';
   }
 }
 
-const NotificationItem = ({ notification }: { notification: Notification }) => {
+interface UnifiedNotification {
+  type: string;
+  message: string;
+  timestamp?: Date;
+  application?: string;
+  correlationId?: string;
+}
+
+const NotificationItem = ({ notification }: { notification: UnifiedNotification }) => {
   const notificationItem: NotificationItemProps = {
     icon: getIcon(notification.type),
     color: getColor(notification.type),
-    message: notification.message,
+    message: notification.application 
+      ? `[${notification.application}] ${notification.message}`
+      : notification.message,
     timestamp: notification.timestamp
   }
 
@@ -109,7 +121,7 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
 
 const Index = () => {
   const [isSimulating, setIsSimulating] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<UnifiedNotification[]>([]);
   const [simulatedCar, setSimulatedCar] = useState<SimulatedCar | null>(null);
 
   const startSimulation = async () => {
@@ -127,16 +139,20 @@ const Index = () => {
     try {
       car.client = client;
 
-      // Set up notification handling
+      // Set up notification handling for both types
       await client.consumeNotifications((notification) => {
         console.log('Received notification:', JSON.stringify(notification, null, 2));
         setNotifications(prev => {
           const updatedNotifications = [...prev, notification];
-          updatedNotifications.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+          updatedNotifications.sort((a, b) => 
+            (new Date(a.timestamp || Date.now())).getTime() - 
+            (new Date(b.timestamp || Date.now())).getTime()
+          );
           return updatedNotifications.slice(-50);
         });
 
-        if (client.isPendingRequest(notification.correlationId)) {
+        // Only check correlation ID for car notifications (not general notifications)
+        if ('correlationId' in notification && client.isPendingRequest(notification.correlationId)) {
           client.clearPendingRequest(notification.correlationId);
         }
       });

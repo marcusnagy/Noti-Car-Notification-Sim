@@ -1,11 +1,13 @@
 import { AMQPWebSocketClient, AMQPChannel } from '@cloudamqp/amqp-client';
 import { v4 as uuidv4 } from 'uuid';
+import { NotificationType } from './NotificationService';
 
 
-// Constants matching the Go code
+// Constants matching the other client
 const CAR_EXCHANGE = 'car.events';
 const CAR_METADATA_QUEUE = 'car.metadata';
 const CAR_NOTIFICATION_QUEUE = 'car.notifications.';
+const GENERAL_EXCHANGE = 'fanout.events';
 
 export interface CarMetadata {
   latitude: number;
@@ -18,6 +20,13 @@ export interface Notification {
   type: string;
   message: string;
   correlationId: string;
+  timestamp?: Date;
+}
+
+export interface GeneralNotificaiton {
+  type: NotificationType;
+  application: string;
+  message: string;
   timestamp?: Date;
 }
 
@@ -69,6 +78,16 @@ export class RabbitMQClient {
       await this.channel.exchangeDeclare(
         CAR_EXCHANGE,
         'topic',
+        {
+          durable: true,
+          autoDelete: false,
+          internal: false,
+        }
+      );
+
+      await this.channel.exchangeDeclare(
+        GENERAL_EXCHANGE,
+        'fanout',
         {
           durable: true,
           autoDelete: false,
@@ -153,7 +172,7 @@ export class RabbitMQClient {
     });
   }
 
-  async consumeNotifications(handler: (notification: Notification) => void): Promise<void> {
+  async consumeNotifications(handler: (notification: Notification | GeneralNotificaiton) => void): Promise<void> {
     await this.connectionPromise;
     
     if (!this.isConnected || !this.channel || this.channel.closed) {
@@ -162,37 +181,59 @@ export class RabbitMQClient {
 
     return new Promise((resolve, reject) => {
       try {
-        // First ensure the queue is bound
+        // Set up message handler for both types of notifications
+        const messageHandler = (message) => {
+          try {
+            console.log('Received message on queue:', message);
+            const decoder = new TextDecoder();
+            const bodyString = decoder.decode(message.body);
+            const data = JSON.parse(bodyString);
+            
+            // Check if it's a general notification by looking for the 'application' field
+            if ('application' in data) {
+              handler(data as GeneralNotificaiton);
+            } else {
+              handler(data as Notification);
+              // Clear pending request if it's a car notification
+              if (this.isPendingRequest(data.correlationId)) {
+                this.clearPendingRequest(data.correlationId);
+              }
+            }
+          } catch (error) {
+            console.error('Error processing message:', error);
+          }
+        };
+
+        // First bind and consume from car notifications
         this.channel.queueBind(
           this.notificationQueue,
           CAR_EXCHANGE,
           CAR_NOTIFICATION_QUEUE + this.notificationQueue,
           {}
         ).then(() => {
-          // Only start consuming after successful binding
           return this.channel.basicConsume(
             this.notificationQueue,
             {
               'noAck': true,
-              'exclusive': true,  // Changed to true to ensure single consumer
+              'exclusive': true,
             },
-            (message) => {
-              try {
-                console.log('Received message on queue:', message);
-                const decoder = new TextDecoder();
-                const bodyString = decoder.decode(message.body);
-                const notification: Notification = JSON.parse(bodyString);
-                handler(notification);
-              } catch (error) {
-                console.error('Error processing message:', error);
-              }
-            }
+            messageHandler
           );
         }).then(() => {
-          console.log('Successfully subscribed to notifications queue:', this.notificationQueue);
+          console.log('Successfully subscribed to car notifications queue');
+          
+          // Then bind and consume from general notifications
+          return this.channel.queueBind(
+            this.notificationQueue,
+            GENERAL_EXCHANGE,
+            '', // fanout exchange doesn't use routing keys
+            {}
+          );
+        }).then(() => {
+          console.log('Successfully bound to general notifications exchange');
           resolve();
         }).catch((error) => {
-          console.error('Failed to set up consumer:', error);
+          console.error('Failed to set up consumers:', error);
           reject(error);
         });
       } catch (error) {
