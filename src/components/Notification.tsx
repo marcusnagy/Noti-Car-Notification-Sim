@@ -10,11 +10,19 @@ import {
   ModalProvider,
 } from "@/components/ui/animated-modal";
 import { Input } from "@/components/ui/input";
-import { Send, CheckCircle2, XCircle, AlertOctagon, Info } from "lucide-react";
+import { Send, CheckCircle2, XCircle, AlertOctagon, Info, MonitorSmartphone, Car, Bot, MapPin, Navigation, Users } from "lucide-react";
 import { toast } from "sonner";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { NotificationService, NotificationType } from "@/services/NotificationService";
 import { cn } from "@/lib/utils";
+import {
+  FourScreenIcon,
+  CarSyncIcon,
+  ZeekrGPTIcon,
+  ZeekrPlacesIcon,
+  NaviIcon,
+  ZeekrCircleIcon,
+} from "@/components/icons/app-icons";
 
 interface NotificationTypeOption {
   value: NotificationType;
@@ -23,30 +31,69 @@ interface NotificationTypeOption {
   color: string;
 }
 
+interface ApplicationIcon {
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+}
+
+const applicationIcons: ApplicationIcon[] = [
+  {
+    name: "4screen",
+    icon: <FourScreenIcon className="h-5 w-5" />,
+    color: "stroke-indigo-500 dark:stroke-indigo-400",
+  },
+  {
+    name: "carsync",
+    icon: <CarSyncIcon className="h-5 w-5" />,
+    color: "stroke-cyan-500 dark:stroke-cyan-400",
+  },
+  {
+    name: "ZeekrGPT",
+    icon: <ZeekrGPTIcon className="h-5 w-5" />,
+    color: "stroke-purple-500 dark:stroke-purple-400",
+  },
+  {
+    name: "Zeekr Places",
+    icon: <ZeekrPlacesIcon className="h-5 w-5" />,
+    color: "stroke-rose-500 dark:stroke-rose-400",
+  },
+  {
+    name: "Navi",
+    icon: <NaviIcon className="h-5 w-5" />,
+    color: "stroke-teal-500 dark:stroke-teal-400",
+  },
+  {
+    name: "Zeekr Circle",
+    icon: <ZeekrCircleIcon className="h-5 w-5" />,
+    color: "stroke-orange-500 dark:stroke-orange-400",
+  },
+];
+
 const notificationTypes: NotificationTypeOption[] = [
   {
     value: 'info',
     label: 'Information',
-    icon: <Info className="h-4 w-4" />,
-    color: 'text-blue-500 dark:text-blue-400',
+    icon: <Info className="h-4 w-4 stroke-[2.5]" />,
+    color: 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300',
   },
   {
     value: 'warning',
     label: 'Warning',
-    icon: <AlertOctagon className="h-4 w-4" />,
-    color: 'text-amber-500 dark:text-amber-400',
+    icon: <AlertOctagon className="h-4 w-4 stroke-[2.5]" />,
+    color: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300',
   },
   {
     value: 'error',
     label: 'Error',
-    icon: <XCircle className="h-4 w-4" />,
-    color: 'text-red-500 dark:text-red-400',
+    icon: <XCircle className="h-4 w-4 stroke-[2.5]" />,
+    color: 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300',
   },
   {
     value: 'ack',
     label: 'Acknowledgment',
-    icon: <CheckCircle2 className="h-4 w-4" />,
-    color: 'text-emerald-500 dark:text-emerald-400',
+    icon: <CheckCircle2 className="h-4 w-4 stroke-[2.5]" />,
+    color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
   },
 ];
 
@@ -125,7 +172,7 @@ function NotificationForm() {
               <select
                 value={selectedApp}
                 onChange={(e) => setSelectedApp(e.target.value)}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-800 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-800 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="">Select an application</option>
@@ -133,6 +180,14 @@ function NotificationForm() {
                   <option key={app} value={app}>{app}</option>
                 ))}
               </select>
+              {selectedApp && (
+                <div className={cn(
+                  "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none",
+                  applicationIcons.find(icon => icon.name === selectedApp)?.color
+                )}>
+                  {applicationIcons.find(icon => icon.name === selectedApp)?.icon}
+                </div>
+              )}
             </div>
           </div>
 
@@ -160,30 +215,35 @@ function NotificationForm() {
                   onClick={() => setShowTypeDropdown(!showTypeDropdown)}
                 >
                   <div className="flex items-center gap-2">
-                    {notificationTypes.find(t => t.value === selectedType)?.icon}
-                    <span className={cn(
+                    <div className={cn(
+                      "p-1 rounded-md",
                       notificationTypes.find(t => t.value === selectedType)?.color
                     )}>
+                      {notificationTypes.find(t => t.value === selectedType)?.icon}
+                    </div>
+                    <span className="font-medium">
                       {notificationTypes.find(t => t.value === selectedType)?.label}
                     </span>
                   </div>
                 </div>
                 {showTypeDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg">
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg divide-y divide-gray-100 dark:divide-gray-700">
                     {notificationTypes.map((type) => (
                       <div
                         key={type.value}
                         className={cn(
-                          "px-3 py-2 flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700",
-                          type.value === selectedType && "bg-gray-100 dark:bg-gray-700"
+                          "px-3 py-2 flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700",
+                          type.value === selectedType && "bg-gray-50 dark:bg-gray-700"
                         )}
                         onClick={() => {
                           setSelectedType(type.value);
                           setShowTypeDropdown(false);
                         }}
                       >
-                        {type.icon}
-                        <span className={type.color}>{type.label}</span>
+                        <div className={cn("p-1 rounded-md", type.color)}>
+                          {type.icon}
+                        </div>
+                        <span className="font-medium">{type.label}</span>
                       </div>
                     ))}
                   </div>

@@ -5,8 +5,18 @@ import { NotificationModal } from "@/components/Notification";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { RabbitMQClient, CarMetadata, Notification, GeneralNotificaiton } from "@/services/RabbitMQService";
 import { AnimatedList } from "@/components/ui/animated-list";
-import { Alert } from "@heroui/alert";
+import { Alert } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import {
+  FourScreenIcon,
+  CarSyncIcon,
+  ZeekrGPTIcon,
+  ZeekrPlacesIcon,
+  NaviIcon,
+  ZeekrCircleIcon,
+} from "@/components/icons/app-icons";
+import { UnifiedNotification, ApplicationName, NotificationType } from '@/types/notification';
+import { getAppIcon } from '@/components/icons/app-icons';
 
 interface SimulatedCar {
   id: string;
@@ -59,38 +69,41 @@ function getColor(type: string): 'warning' | 'default' | 'primary' | 'secondary'
   }
 }
 
-interface UnifiedNotification {
-  type: string;
-  message: string;
-  timestamp?: Date;
-  application?: string;
-  correlationId?: string;
-}
+const notificationTypeIcons = {
+  info: <Info className="h-5 w-5 stroke-blue-500 dark:stroke-blue-400" strokeWidth={2} />,
+  warning: <AlertOctagon className="h-5 w-5 stroke-amber-500 dark:stroke-amber-400" strokeWidth={2} />,
+  error: <XCircle className="h-5 w-5 stroke-red-500 dark:stroke-red-400" strokeWidth={2} />,
+  danger: <XCircle className="h-5 w-5 stroke-red-500 dark:stroke-red-400" strokeWidth={2} />,
+  ack: <CheckCircle2 className="h-5 w-5 stroke-emerald-500 dark:stroke-emerald-400" strokeWidth={2} />,
+};
 
 const NotificationItem = ({ notification }: { notification: UnifiedNotification }) => {
-  const notificationItem: NotificationItemProps = {
-    icon: getIcon(notification.type),
-    color: getColor(notification.type),
-    message: notification.application 
-      ? `[${notification.application}] ${notification.message}`
-      : notification.message,
-    timestamp: notification.timestamp
-  }
+  const isApplicationNotification = 'application' in notification;
+  const icon = isApplicationNotification ? 
+    getAppIcon(notification.application) : 
+    notificationTypeIcons[notification.type as keyof typeof notificationTypeIcons];
 
   return (
     <Alert
-      icon={notificationItem.icon}
-      color={notificationItem.color}
+      icon={icon}
       className={cn(
         "w-full backdrop-blur-sm border transition-all duration-200",
         "hover:scale-[101%] hover:shadow-lg",
         "dark:bg-gray-900/50 dark:border-gray-800",
         "relative overflow-hidden",
         {
-          "bg-emerald-50/50 dark:bg-emerald-500/5": notificationItem.color === 'success',
-          "bg-blue-50/50 dark:bg-blue-500/5": notificationItem.color === 'primary',
-          "bg-amber-50/50 dark:bg-amber-500/5": notificationItem.color === 'warning',
-          "bg-violet-50/50 dark:bg-violet-500/5": notificationItem.color === 'secondary',
+          // Application-specific backgrounds
+          "bg-indigo-50/50 dark:bg-indigo-500/5": isApplicationNotification && notification.application === "4screen",
+          "bg-cyan-50/50 dark:bg-cyan-500/5": isApplicationNotification && notification.application === "carsync",
+          "bg-purple-50/50 dark:bg-purple-500/5": isApplicationNotification && notification.application === "ZeekrGPT",
+          "bg-rose-50/50 dark:bg-rose-500/5": isApplicationNotification && notification.application === "Zeekr Places",
+          "bg-teal-50/50 dark:bg-teal-500/5": isApplicationNotification && notification.application === "Navi",
+          "bg-orange-50/50 dark:bg-orange-500/5": isApplicationNotification && notification.application === "Zeekr Circle",
+          // Notification type backgrounds
+          "bg-blue-50/50 dark:bg-blue-500/5": !isApplicationNotification && notification.type === 'info',
+          "bg-amber-50/50 dark:bg-amber-500/5": !isApplicationNotification && notification.type === 'warning',
+          "bg-red-50/50 dark:bg-red-500/5": !isApplicationNotification && (notification.type === 'error' || notification.type === 'danger'),
+          "bg-emerald-50/50 dark:bg-emerald-500/5": !isApplicationNotification && notification.type === 'ack',
         }
       )}
     >
@@ -100,12 +113,22 @@ const NotificationItem = ({ notification }: { notification: UnifiedNotification 
             <span className={cn(
               "font-medium block truncate",
               {
-                "text-emerald-700 dark:text-emerald-300": notificationItem.color === 'success',
-                "text-blue-700 dark:text-blue-300": notificationItem.color === 'primary',
-                "text-amber-700 dark:text-amber-300": notificationItem.color === 'warning',
-                "text-violet-700 dark:text-violet-300": notificationItem.color === 'secondary',
+                // Application-specific text colors
+                "text-indigo-700 dark:text-indigo-300": isApplicationNotification && notification.application === "4screen",
+                "text-cyan-700 dark:text-cyan-300": isApplicationNotification && notification.application === "carsync",
+                "text-purple-700 dark:text-purple-300": isApplicationNotification && notification.application === "ZeekrGPT",
+                "text-rose-700 dark:text-rose-300": isApplicationNotification && notification.application === "Zeekr Places",
+                "text-teal-700 dark:text-teal-300": isApplicationNotification && notification.application === "Navi",
+                "text-orange-700 dark:text-orange-300": isApplicationNotification && notification.application === "Zeekr Circle",
+                // Notification type text colors
+                "text-blue-700 dark:text-blue-300": !isApplicationNotification && notification.type === 'info',
+                "text-amber-700 dark:text-amber-300": !isApplicationNotification && notification.type === 'warning',
+                "text-red-700 dark:text-red-300": !isApplicationNotification && (notification.type === 'error' || notification.type === 'danger'),
+                "text-emerald-700 dark:text-emerald-300": !isApplicationNotification && notification.type === 'ack',
               }
-            )}>{notification.type.toUpperCase()}</span>
+            )}>
+              {isApplicationNotification ? notification.application : notification.type}
+            </span>
           </div>
           <div className="flex-shrink-0 ml-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -117,6 +140,26 @@ const NotificationItem = ({ notification }: { notification: UnifiedNotification 
       </div>
     </Alert>
   );
+};
+
+const convertToUnifiedNotification = (notification: Notification | GeneralNotificaiton): UnifiedNotification => {
+  const timestamp = notification.timestamp instanceof Date ? 
+    notification.timestamp.toISOString() : 
+    notification.timestamp;
+
+  if ('application' in notification) {
+    return {
+      application: notification.application as ApplicationName,
+      message: notification.message,
+      timestamp,
+    };
+  } else {
+    return {
+      type: notification.type as NotificationType,
+      message: notification.message,
+      timestamp,
+    };
+  }
 };
 
 const Index = () => {
@@ -143,7 +186,7 @@ const Index = () => {
       await client.consumeNotifications((notification) => {
         console.log('Received notification:', JSON.stringify(notification, null, 2));
         setNotifications(prev => {
-          const updatedNotifications = [...prev, notification];
+          const updatedNotifications = [...prev, convertToUnifiedNotification(notification)];
           updatedNotifications.sort((a, b) => 
             (new Date(a.timestamp || Date.now())).getTime() - 
             (new Date(b.timestamp || Date.now())).getTime()

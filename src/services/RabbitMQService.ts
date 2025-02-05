@@ -8,6 +8,7 @@ const CAR_EXCHANGE = 'car.events';
 const CAR_METADATA_QUEUE = 'car.metadata';
 const CAR_NOTIFICATION_QUEUE = 'car.notifications.';
 const GENERAL_EXCHANGE = 'fanout.events';
+const GENERAL_NOTIFICATION_QUEUE = 'general.notifications';
 
 export interface CarMetadata {
   latitude: number;
@@ -34,6 +35,7 @@ export class RabbitMQClient {
   private client: AMQPWebSocketClient;
   private channel: AMQPChannel;
   private notificationQueue: string = '';
+  private generalQueue: string = '';
   private pendingRequests: Set<string> = new Set();
   private pendingRequestsMutex: Promise<void> = Promise.resolve();
   private connectionPromise: Promise<void>;
@@ -94,6 +96,14 @@ export class RabbitMQClient {
           internal: false,
         }
       );
+      const queueGeneral = await this.channel.queueDeclare(
+        GENERAL_NOTIFICATION_QUEUE,
+        {
+          durable: true,
+          autoDelete: false,
+          exclusive: false,
+        }
+      );
 
       const queueResult = await this.channel.queueDeclare(
         "",
@@ -107,6 +117,11 @@ export class RabbitMQClient {
       if (queueResult) {
         this.notificationQueue = queueResult.name;
         console.log('Queue created:', this.notificationQueue);
+      }
+
+      if (queueGeneral) {
+        this.generalQueue = queueGeneral.name;
+        console.log('General queue created:', this.generalQueue);
       }
 
       this.isConnected = true;
@@ -224,14 +239,26 @@ export class RabbitMQClient {
           
           // Then bind and consume from general notifications
           return this.channel.queueBind(
-            this.notificationQueue,
+            this.generalQueue,
             GENERAL_EXCHANGE,
             '', // fanout exchange doesn't use routing keys
             {}
-          );
-        }).then(() => {
-          console.log('Successfully bound to general notifications exchange');
-          resolve();
+          ).then(() => {
+            return this.channel.basicConsume(
+              this.generalQueue,
+              {
+                'noAck': true,
+                'exclusive': false,
+              },
+              messageHandler
+            );
+          }).then(() => {
+            console.log('Successfully bound to general notifications exchange');
+            resolve();
+          }).catch((error) => {
+            console.error('Failed to set up consumers:', error);
+            reject(error);
+          });
         }).catch((error) => {
           console.error('Failed to set up consumers:', error);
           reject(error);
