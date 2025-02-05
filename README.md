@@ -16,6 +16,10 @@ The project leverages modern web technologies including:
 - shadcn-ui
 - Tailwind CSS
 
+## Backend Service
+
+The backend service for the APIs and RabbitMQ broker can be found [here](https://github.com/marcusnagy/noti-rabbitmq-service).
+
 ## Features
 
 - **Real-Time Car Simulation:**  
